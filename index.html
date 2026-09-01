@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
-<meta name="description" content="TeXmExDeX's Teleidoscope — A real-time infinite recursive self-mosaic engine. Runs entirely client-side.">
+<meta name="description" content="A photomosaic that rebuilds any picture out of tinted copies of itself, nested down to the pixel, with an endless zoom. Runs entirely in your browser.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 fill=%27%23101014%27/%3E%3Crect x=%272%27 y=%272%27 width=%2728%27 height=%2728%27 fill=%27%23d5975f%27/%3E%3Crect x=%278%27 y=%278%27 width=%2716%27 height=%2716%27 fill=%27%233d5f8e%27/%3E%3Crect x=%2712%27 y=%2712%27 width=%278%27 height=%278%27 fill=%27%23d5975f%27/%3E%3Crect x=%2714%27 y=%2714%27 width=%274%27 height=%274%27 fill=%27%23101014%27/%3E%3C/svg%3E">
-<title>TeXmExDeX's Teleidoscope</title>
+<title>Tautological Teleidescope</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 :root{
@@ -16,7 +16,7 @@
   --accent-ink:#FFFFFF;
   --field:#FFFFFF;
   --shadow: 0 1px 2px rgba(18,18,28,.07), 0 10px 28px rgba(18,18,28,.09);
-  --rail: 320px;
+  --rail: 306px;
   --f-ui:"Archivo","Helvetica Neue",Arial,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
 }
@@ -38,34 +38,40 @@
   --field:#101016;
   --shadow: 0 1px 2px rgba(0,0,0,.5), 0 12px 30px rgba(0,0,0,.45);
 }
-*{box-sizing:border-box;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+*{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:13px;
-  -webkit-font-smoothing:antialiased;overflow:hidden;height:100vh;height:100dvh}
+  -webkit-font-smoothing:antialiased;overflow:hidden}
 button,input,select{font-family:inherit;font-size:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
-.app{display:grid;grid-template-rows:auto 1fr;height:100vh;height:100dvh;width:100vw;overflow:hidden}
+.app{display:grid;grid-template-rows:auto 1fr;height:100vh;height:100dvh;
+  width:100vw;max-width:100%;overflow:hidden;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  background:var(--panel)}
+html,body{width:100%;max-width:100%;overflow-x:hidden}
 
 /* ---------- header ---------- */
-.bar{display:flex;align-items:center;gap:16px;padding:0 16px;height:54px;
-  background:var(--panel);border-bottom:1px solid var(--line);position:relative;z-index:10}
-.mark{display:flex;align-items:baseline;gap:8px;flex:0 0 auto}
-.mark b{font-weight:700;font-stretch:118%;letter-spacing:.11em;font-size:15px;text-transform:uppercase}
+.bar{display:flex;align-items:center;gap:22px;padding:0 16px;height:56px;
+  background:var(--panel);border-bottom:1px solid var(--line);position:relative;z-index:5}
+.mark{display:flex;align-items:baseline;gap:9px;flex:0 0 auto}
+.mark{max-width:min(46vw,420px)}
+.mark b{font-weight:700;font-stretch:112%;letter-spacing:.05em;font-size:14px;text-transform:uppercase;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mark span{font-family:var(--f-mono);font-size:10.5px;color:var(--ink3);letter-spacing:.02em}
 .colormap{display:flex;align-items:center;gap:10px;flex:0 0 auto}
-.colormap canvas{width:80px;height:48px;display:block;border:1px solid var(--line);
+.colormap canvas{width:104px;height:64px;display:block;border:1px solid var(--line);
   background:var(--bg2);image-rendering:pixelated;border-radius:2px}
 .colormap .cap{font-family:var(--f-mono);font-size:9.5px;line-height:1.5;color:var(--ink3);
   letter-spacing:.04em;text-transform:uppercase}
 .colormap .cap i{display:block;font-style:normal;color:var(--ink2)}
 .bar .spacer{flex:1 1 auto}
 .filemeta{font-family:var(--f-mono);font-size:10.5px;color:var(--ink2);text-align:right;line-height:1.55;
-  max-width:200px;overflow:hidden}
+  max-width:230px;overflow:hidden}
 .filemeta b{display:block;font-weight:500;color:var(--ink);white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
 
 /* ---------- buttons ---------- */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:32px;padding:0 12px;
-  border:1px solid var(--line);border-radius:4px;background:var(--bg2);color:var(--ink);
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:30px;padding:0 13px;
+  border:1px solid var(--line);border-radius:3px;background:var(--bg2);color:var(--ink);
   font-size:12px;font-weight:500;letter-spacing:.02em;cursor:pointer;white-space:nowrap;
   transition:background .12s,border-color .12s,color .12s}
 .btn:hover{border-color:var(--accent);color:var(--accent)}
@@ -78,13 +84,11 @@ button,input,select{font-family:inherit;font-size:inherit;color:inherit}
 .btnrow>*{flex:1 1 0}
 
 /* ---------- stage ---------- */
-.stage{display:grid;grid-template-columns:var(--rail) 1fr;min-height:0;height:100%;position:relative;overflow:hidden}
+.stage{display:grid;grid-template-columns:var(--rail) 1fr;min-height:0;position:relative}
 .stage.collapsed{grid-template-columns:0 1fr}
 .rail{background:var(--panel);border-right:1px solid var(--line);overflow-y:auto;overflow-x:hidden;
-  display:flex;flex-direction:column;min-width:0;z-index:20;overscroll-behavior:contain}
+  display:flex;flex-direction:column;min-width:0}
 .stage.collapsed .rail{display:none}
-.rail-mobile-head{display:none}
-
 .grp{border-bottom:1px solid var(--line-soft);padding:14px 16px 16px;display:flex;flex-direction:column;gap:11px}
 .grp>h3{margin:0 0 1px;font-family:var(--f-mono);font-size:9.5px;font-weight:500;letter-spacing:.13em;
   text-transform:uppercase;color:var(--ink3)}
@@ -93,113 +97,94 @@ button,input,select{font-family:inherit;font-size:inherit;color:inherit}
 .row .lab span{color:var(--ink2);font-size:12px}
 .row .lab var{font-family:var(--f-mono);font-style:normal;font-size:11px;color:var(--ink);
   font-variant-numeric:tabular-nums}
-input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:24px;background:transparent;cursor:pointer;margin:0}
-input[type=range]::-webkit-slider-runnable-track{height:3px;background:var(--line);border-radius:2px}
-input[type=range]::-moz-range-track{height:3px;background:var(--line);border-radius:2px}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;
-  background:var(--accent);margin-top:-6.5px;border:none}
-input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--accent);border:none}
-select,input[type=number]{height:34px;width:100%;padding:0 8px;background:var(--field);
-  border:1px solid var(--line);border-radius:4px;font-family:var(--f-mono);font-size:12px}
-input[type=color]{width:100%;height:34px;padding:2px;background:var(--field);border:1px solid var(--line);
-  border-radius:4px;cursor:pointer}
-.check{display:flex;align-items:center;gap:10px;cursor:pointer;color:var(--ink2);font-size:12.5px;padding:4px 0}
-.check input{accent-color:var(--accent);width:16px;height:16px;margin:0;cursor:pointer}
-.note{font-size:11px;line-height:1.45;color:var(--ink3);margin:0}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:16px;background:transparent;cursor:pointer;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:2px;background:var(--line);border-radius:2px}
+input[type=range]::-moz-range-track{height:2px;background:var(--line);border-radius:2px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;
+  background:var(--accent);margin-top:-4.5px;border:none}
+input[type=range]::-moz-range-thumb{width:11px;height:11px;border-radius:50%;background:var(--accent);border:none}
+select,input[type=number]{height:29px;width:100%;padding:0 8px;background:var(--field);
+  border:1px solid var(--line);border-radius:3px;font-family:var(--f-mono);font-size:11.5px}
+input[type=color]{width:100%;height:29px;padding:2px;background:var(--field);border:1px solid var(--line);
+  border-radius:3px;cursor:pointer}
+.check{display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--ink2);font-size:12px}
+.check input{accent-color:var(--accent);width:14px;height:14px;margin:0;cursor:pointer}
+.note{font-size:11px;line-height:1.5;color:var(--ink3);margin:0}
+.grp.credit{margin-top:auto;border-bottom:none;border-top:1px solid var(--line-soft)}
+.grp.credit .note{letter-spacing:.02em}
+.grp.credit .note b{color:var(--ink2);font-weight:600;font-stretch:108%}
 
 /* ---------- canvas ---------- */
-.view{position:relative;min-width:0;background:var(--bg2);overflow:hidden;height:100%;width:100%}
+.view{position:relative;min-width:0;background:var(--bg2);overflow:hidden}
 #gl{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:none}
 #gl.drag{cursor:grabbing}
-.status{position:absolute;left:12px;bottom:calc(12px + env(safe-area-inset-bottom, 0px));display:flex;gap:1px;
-  background:var(--line);border:1px solid var(--line);border-radius:4px;overflow:hidden;box-shadow:var(--shadow);
-  font-family:var(--f-mono);font-size:10px;font-variant-numeric:tabular-nums;pointer-events:none;z-index:5}
-.status div{background:var(--panel);padding:4px 7px;color:var(--ink2)}
+.status{position:absolute;left:12px;bottom:12px;display:flex;gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:3px;overflow:hidden;box-shadow:var(--shadow);
+  font-family:var(--f-mono);font-size:10.5px;font-variant-numeric:tabular-nums;pointer-events:none}
+.status div{background:var(--panel);padding:5px 9px;color:var(--ink2)}
 .status div b{color:var(--ink);font-weight:500}
-
-.railtoggle{position:absolute;left:12px;top:12px;z-index:6}
+.railtoggle{position:absolute;left:12px;top:12px;z-index:3}
 .stage:not(.collapsed) .railtoggle{display:none}
 
-.mobile-actions{display:none}
-
 .drop{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;
-  background:color-mix(in srgb, var(--bg2) 78%, transparent);opacity:0;transition:opacity .15s;z-index:15}
+  background:color-mix(in srgb, var(--bg2) 78%, transparent);opacity:0;transition:opacity .15s}
 .drop.show{opacity:1}
-.drop .inner{border:1px dashed var(--accent);border-radius:6px;padding:26px 40px;text-align:center;
+.drop .inner{border:1px dashed var(--accent);border-radius:4px;padding:26px 40px;text-align:center;
   background:var(--panel);box-shadow:var(--shadow)}
 .drop h2{margin:0 0 6px;font-size:15px;font-weight:700;font-stretch:112%;letter-spacing:.02em}
 .drop p{margin:0;font-size:12px;color:var(--ink2)}
 
 /* ---------- export modal ---------- */
-.modal{position:fixed;inset:0;z-index:50;display:none;place-items:center;padding:16px;
-  background:color-mix(in srgb, var(--bg) 82%, transparent);padding-bottom:calc(16px + env(safe-area-inset-bottom, 0px))}
+.modal{position:fixed;inset:0;z-index:20;display:none;place-items:center;padding:28px;
+  background:color-mix(in srgb, var(--bg) 82%, transparent)}
 .modal.show{display:grid}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;box-shadow:var(--shadow);
-  max-width:min(860px,94vw);max-height:90vh;max-height:90dvh;display:flex;flex-direction:column;overflow:hidden}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:5px;box-shadow:var(--shadow);
+  max-width:min(860px,92vw);max-height:88vh;display:flex;flex-direction:column;overflow:hidden}
 .card header{display:flex;align-items:center;gap:14px;padding:12px 14px;border-bottom:1px solid var(--line-soft)}
 .card header h2{margin:0;font-size:13px;font-weight:700;font-stretch:112%;letter-spacing:.04em;text-transform:uppercase}
 .card header .m{font-family:var(--f-mono);font-size:10.5px;color:var(--ink3)}
-.card .body{padding:12px;overflow:auto;background:var(--bg2)}
-.card .body img{max-width:100%;max-height:50vh;display:block;margin:0 auto;border:1px solid var(--line)}
-.card footer{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:12px 14px;border-top:1px solid var(--line-soft)}
-.card footer p{margin:0;flex:1 1 100%;font-size:11.5px;color:var(--ink3);line-height:1.45}
+.card .body{padding:14px;overflow:auto;background:var(--bg2)}
+.card .body img{max-width:100%;max-height:56vh;display:block;margin:0 auto;border:1px solid var(--line)}
+.card footer{display:flex;align-items:center;gap:10px;padding:12px 14px;border-top:1px solid var(--line-soft)}
+.card footer p{margin:0;flex:1;font-size:11.5px;color:var(--ink3);line-height:1.45}
 
-/* ---------- mobile drawer adjustments ---------- */
-@media (max-width:820px){
-  .bar{padding:0 12px;gap:8px}
-  .mark span,.colormap,.filemeta{display:none}
-  .stage{display:block;grid-template-columns:none}
-  
-  .rail{
-    position:fixed;
-    inset:auto 0 0 0;
-    max-height:82dvh;
-    border-radius:14px 14px 0 0;
-    border-top:1px solid var(--line);
-    border-right:none;
-    box-shadow:0 -6px 28px rgba(0,0,0,0.35);
-    transform:translateY(0);
-    transition:transform .24s cubic-bezier(0.16, 1, 0.3, 1);
-    padding-bottom:calc(16px + env(safe-area-inset-bottom, 0px));
-  }
-  .stage.collapsed .rail{
-    display:flex;
-    transform:translateY(105%);
-    pointer-events:none;
-  }
-  .rail-mobile-head{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:12px 16px;
-    border-bottom:1px solid var(--line-soft);
-    position:sticky;
-    top:0;
-    background:var(--panel);
-    z-index:5;
-  }
-  .rail-mobile-head b{font-size:13px;letter-spacing:.06em;text-transform:uppercase}
-  .stage:not(.collapsed) .railtoggle{display:none}
-  .stage.collapsed .railtoggle{display:inline-flex}
-
-  .mobile-actions{
-    display:flex;
-    position:absolute;
-    right:12px;
-    top:12px;
-    gap:6px;
-    z-index:6;
-  }
-  .status{font-size:9px;max-width:calc(100vw - 24px);overflow-x:auto}
-  .status div{padding:3px 6px}
-}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:820px){
+  .colormap,.filemeta{display:none}
+  /* Tighten the header so the wordmark + buttons always fit the phone width
+     instead of forcing the page wider than the screen. */
+  .bar{gap:8px;padding:0 10px}
+  .mark{flex:1 1 auto;min-width:0;max-width:none}
+  .mark span{display:none}
+  .mark b{font-size:13px}
+  .bar .btn{padding:0 10px}
+  /* "Open image" is duplicated by the drawer's "Choose file"; hide it here so
+     the header (Fit / Ascend / Dive) stays within the phone width. */
+  #openBtn{display:none}
+  /* Single column: the canvas view fills the stage, and the rail becomes an
+     overlay drawer so it never pushes the view off-screen. */
+  .stage,.stage.collapsed{grid-template-columns:1fr}
+  .rail{position:absolute;inset:0;z-index:4;width:100%;
+    border-right:none;box-shadow:var(--shadow);padding-bottom:24px}
+  .stage.collapsed .rail{display:none}
+  .view{grid-column:1;grid-row:1}
+  .railtoggle{display:inline-flex}
+  .stage:not(.collapsed) .railtoggle{display:none}
+  .railclose{display:inline-flex}
+}
+.railclose{display:none}
+.railclose-grp{display:none}
+@media (max-width:820px){
+  .railclose-grp{display:block;position:sticky;top:0;z-index:1;
+    background:var(--panel);border-bottom:1px solid var(--line)}
+}
 </style>
+
 </head>
 <body>
 <div class="app">
   <div class="bar">
-    <div class="mark"><b>TeXmExDeX's</b><span>Teleidoscope</span></div>
+    <div class="mark"><b>Tautological Teleidescope</b><span>recursive self-mosaic</span></div>
     <div class="colormap">
       <canvas id="mapcv" width="40" height="40" aria-label="Color map sampled from the image"></canvas>
       <div class="cap">color map<i id="mapdim">-</i></div>
@@ -208,14 +193,15 @@ input[type=color]{width:100%;height:34px;padding:2px;background:var(--field);bor
     <div class="filemeta"><b id="fname">sample scene</b><span id="fdim">-</span></div>
     <button class="btn" id="openBtn">Open image</button>
     <button class="btn" id="fitBtn">Fit</button>
+    <button class="btn" id="ascendBtn">Ascend</button>
     <button class="btn solid" id="diveBtn">Dive</button>
   </div>
 
-  <div class="stage collapsed" id="stage">
-    <div class="rail" id="rail">
-      <div class="rail-mobile-head">
-        <b>Settings & Controls</b>
-        <button class="btn solid" id="closeRail">Done</button>
+  <div class="stage" id="stage">
+    <div class="rail">
+
+      <div class="grp railclose-grp">
+        <button class="btn solid wide railclose" id="hideRail">Done - view mosaic</button>
       </div>
 
       <div class="grp">
@@ -224,22 +210,22 @@ input[type=color]{width:100%;height:34px;padding:2px;background:var(--field);bor
           <button class="btn" id="openBtn2">Choose file</button>
           <button class="btn" id="sampleBtn">Sample</button>
         </div>
-        <p class="note">Drop an image anywhere, or paste one with Ctrl+V. Runs locally.</p>
+        <p class="note">Drop an image anywhere, or paste one with Ctrl+V. Nothing leaves your machine.</p>
       </div>
 
       <div class="grp">
         <h3>Grid</h3>
         <div class="row">
-          <div class="lab"><span>Cells per side</span><var id="vGrid">20 x 20</var></div>
-          <input type="range" id="sGrid" aria-label="Cells per side" min="0" max="100" step="1" value="37">
+          <div class="lab"><span>Cells per side</span><var id="vGrid">1024 x 1024</var></div>
+          <input type="range" id="sGrid" aria-label="Cells per side" min="0" max="100" step="1" value="100">
         </div>
         <div class="row">
           <div class="lab"><span>Nesting limit</span><var id="vDepth">no limit</var></div>
           <input type="range" id="sDepth" aria-label="Nesting limit" min="1" max="10" step="1" value="10">
         </div>
         <div class="row">
-          <div class="lab"><span>Finest cell</span><var id="vFloor">2.0 px</var></div>
-          <input type="range" id="sFloor" aria-label="Finest cell size in pixels" min="10" max="160" step="1" value="20">
+          <div class="lab"><span>Finest cell</span><var id="vFloor">13.4 px</var></div>
+          <input type="range" id="sFloor" aria-label="Finest cell size in pixels" min="10" max="160" step="1" value="134">
         </div>
         <div class="row">
           <div class="lab"><span>Cell gap</span><var id="vGap">none</var></div>
@@ -253,15 +239,15 @@ input[type=color]{width:100%;height:34px;padding:2px;background:var(--field);bor
           <div class="lab"><span>Blend</span></div>
           <select id="mode" aria-label="Blend mode">
             <option value="3">Level ramp - strongest photo read</option>
-            <option value="0">Multiply - deep and saturated</option>
+            <option value="0" selected>Multiply - deep and saturated</option>
             <option value="1">Soft light - gentle</option>
             <option value="2">Linear light - keeps tile detail</option>
             <option value="4">Flat color - reference only</option>
           </select>
         </div>
         <div class="row">
-          <div class="lab"><span>Tint strength</span><var id="vStr">100%</var></div>
-          <input type="range" id="sStr" aria-label="Tint strength" min="0" max="100" step="1" value="100">
+          <div class="lab"><span>Tint strength</span><var id="vStr">72%</var></div>
+          <input type="range" id="sStr" aria-label="Tint strength" min="0" max="100" step="1" value="72">
         </div>
         <div class="row">
           <div class="lab"><span>Tile contrast</span><var id="vCon">0.90</var></div>
@@ -272,9 +258,10 @@ input[type=color]{width:100%;height:34px;padding:2px;background:var(--field);bor
           <input type="range" id="sSat" aria-label="Tint saturation" min="0" max="220" step="1" value="100">
         </div>
         <div class="row">
-          <div class="lab"><span>Picture fidelity</span><var id="vFid">65%</var></div>
-          <input type="range" id="sFid" aria-label="Picture fidelity" min="0" max="100" step="1" value="65">
+          <div class="lab"><span>Picture fidelity</span><var id="vFid">91%</var></div>
+          <input type="range" id="sFid" aria-label="Picture fidelity" min="0" max="100" step="1" value="91">
         </div>
+        <p class="note">Cells carry the picture at the grid's resolution. Fidelity puts the finer detail back on top of them, so the whole picture reads sharp without the cells having to shrink.</p>
         <label class="check"><input type="checkbox" id="cLin" aria-label="Average colour in linear light" checked> Average color in linear light</label>
         <div class="row">
           <div class="lab"><span>Backing</span></div>
@@ -285,10 +272,11 @@ input[type=color]{width:100%;height:34px;padding:2px;background:var(--field);bor
       <div class="grp">
         <h3>Dive</h3>
         <div class="row">
-          <div class="lab"><span>Speed</span><var id="vSpeed">1.00x</var></div>
-          <input type="range" id="sSpeed" aria-label="Dive speed" min="-200" max="200" step="1" value="60">
+          <div class="lab"><span>Speed</span><var id="vSpeed">0.20 lv/s</var></div>
+          <input type="range" id="sSpeed" aria-label="Dive speed" min="0" max="200" step="1" value="20">
         </div>
-        <p class="note">Pinch or scroll to zoom, drag to pan, double-tap a tile to dive.</p>
+        <p class="note">Each level is the whole picture again, so the dive loops forever. Dive falls inward, Ascend rises back out, both at this speed. Scroll to zoom, drag to pan, double-click a tile to fall into it.</p>
+        <p class="note">Nesting runs down to the finest cell size at every zoom, so no level ever pops into existence while you watch.</p>
       </div>
 
       <div class="grp">
@@ -301,23 +289,27 @@ input[type=color]{width:100%;height:34px;padding:2px;background:var(--field);bor
           <button class="btn" id="expView">This view</button>
           <button class="btn" id="expAll">Whole picture</button>
         </div>
+        <p class="note">Export re-renders at full size, so a big number buys real extra recursion, not just more pixels.</p>
       </div>
+
+      <div class="grp credit">
+        <p class="note"><b>Tautological Teleidescope</b><br>by TeXmExDeX Type Tools</p>
+      </div>
+
     </div>
 
     <div class="view" id="view">
       <canvas id="gl"></canvas>
       <button class="btn railtoggle" id="showRail">Controls</button>
-
       <div class="status">
         <div>layers <b id="stTiles">0</b></div>
         <div>depth <b id="stDepth">0</b></div>
         <div>zoom <b id="stZoom">1x</b></div>
         <div><b id="stFps">60</b> fps</div>
       </div>
-
       <div class="drop" id="drop"><div class="inner">
         <h2>Drop an image here</h2>
-        <p>JPG, PNG, WEBP, or GIF</p>
+        <p>JPG, PNG, WEBP or GIF - it never leaves the browser.</p>
       </div></div>
     </div>
   </div>
@@ -331,8 +323,8 @@ input[type=color]{width:100%;height:34px;padding:2px;background:var(--field);bor
     </header>
     <div class="body"><img id="expImg" alt="Exported mosaic"></div>
     <footer>
-      <p id="expHint">Long-press or right-click to save the full-resolution image.</p>
-      <a class="btn solid" id="expDl" download="teleidoscope.png">Download PNG</a>
+      <p id="expHint">Right-click the image to save it anywhere else.</p>
+      <a class="btn" id="expDl" download="tautological-teleidescope.png">Download PNG</a>
       <button class="btn" id="expClose">Close</button>
     </footer>
   </div>
@@ -343,6 +335,13 @@ input[type=color]{width:100%;height:34px;padding:2px;background:var(--field);bor
 <script>
 (function(){
 "use strict";
+
+/* ============================================================
+   Selfsame Mosaic
+   Every tile is the whole picture again, tinted by the colour
+   of the region it stands in. Tints compose down the chain, so
+   the structure is exactly self-similar and the zoom never ends.
+   ============================================================ */
 
 var VS = `#version 300 es
 in vec2 aCorner;
@@ -364,6 +363,12 @@ void main(){
   gl_Position = vec4(pos.x / uRes.x * 2.0 - 1.0, 1.0 - pos.y / uRes.y * 2.0, 0.0, 1.0);
 }`;
 
+/* The fragment shader carries the recursion the rest of the way down. Each
+   quad the CPU hands over keeps subdividing here until a cell is about one
+   pixel across, so the level where a picture turns into a grid of pictures is
+   always below what the eye can resolve -- and because the stopping rule is the
+   pixel footprint, a quad rendered whole is mathematically identical to the
+   same quad split into G x G children. Nothing pops when the split happens. */
 var FS = `#version 300 es
 precision highp float;
 in vec2 vUv;
@@ -386,7 +391,8 @@ float sl(float b, float s){
   float d = (b <= 0.25) ? ((16.0*b - 12.0)*b + 4.0)*b : sqrt(b);
   return b + (2.0*s - 1.0) * (d - b);
 }
-
+/* uGam / uGamL map the picture's own mean to 0.5, so a tile's average lands on
+   its target colour without crushing or blowing the extremes. */
 vec3 op(vec3 b, vec3 t){
   if(uMode == 4) return t;
   if(uMode < 2){
@@ -436,6 +442,8 @@ void main(){
   vec3 b0 = toLin(s0.rgb);
   vec3 r0 = flag < 0.5 ? b0 : blend(b0, t);
 
+  /* the same tile one level deeper; crossfading the two makes the level count
+     itself continuous instead of stepping */
   vec2 p1 = uv * G, c1 = floor(p1);
   vec3 l1 = texelFetch(uGrid, clamp(ivec2(c1), ivec2(0), ivec2(Gi-1)), 0).rgb;
   vec3 t1 = flag < 0.5 ? l1 : blend(l1, t);
@@ -444,6 +452,12 @@ void main(){
 
   vec3 col = mix(r0, r1, fr);
 
+  /* The mosaic can only draw the picture as finely as the cell grid: G cells
+     across, however deep the nesting goes, because every level re-uses the same
+     G x G colour table. So put the finer detail back by hand -- sample the
+     picture at screen resolution and at cell resolution over the frame, and
+     carry the ratio between them. The tiles keep their own structure; what they
+     gain is the detail the grid was too coarse to hold. */
   if(uFid > 0.0){
     vec2 q = (vec2(gl_FragCoord.x, uRes.y - gl_FragCoord.y) - uRoot.xy) / uRoot.zw;
     vec3 fine = toLin(textureLod(uTex, q, log2(max(uTexW / uRoot.z, 1e-6))).rgb);
@@ -457,16 +471,18 @@ void main(){
   outColor = vec4(mix(uBg, col, gapM), 1.0);
 }`;
 
+/* ---------- element handles ---------- */
 var $ = function(id){ return document.getElementById(id); };
 var cv = $("gl"), stage = $("stage"), viewEl = $("view"), fileIn = $("file"), dropEl = $("drop");
 var mapCv = $("mapcv"), mapCtx = mapCv.getContext("2d");
 
 var gl = cv.getContext("webgl2", {alpha:false, antialias:false, preserveDrawingBuffer:true, powerPreference:"high-performance"});
 if(!gl){
-  document.body.innerHTML = '<div style="padding:40px;font:14px system-ui">WebGL2 is required on this browser.</div>';
+  document.body.innerHTML = '<div style="padding:40px;font:14px system-ui">This tool needs WebGL2, which this browser did not provide. Chrome, Edge, Firefox and Safari 15+ all support it.</div>';
   return;
 }
 
+/* ---------- program ---------- */
 function sh(type, src){
   var s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
   if(!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
@@ -531,20 +547,23 @@ gl.activeTexture(gl.TEXTURE0);
 var MAXTEX = gl.getParameter(gl.MAX_TEXTURE_SIZE);
 var MAXBUF = Math.min(16384, gl.getParameter(gl.MAX_RENDERBUFFER_SIZE) || 8192);
 
+/* ---------- state ---------- */
 var P = {
-  G: 20, levels: 10, floor: 2, gap: 0, fid: 0.65,
-  mode: 3, strength: 1, contrast: 0.9, sat: 1, linear: true, bg: "#101014",
-  speed: 0.6, exportPx: 4096
+  G: 1024, levels: 10, floor: 13.4, gap: 0, fid: 0.91,
+  mode: 0, strength: 0.72, contrast: 0.9, sat: 1, linear: true, bg: "#101014",
+  speed: 0.2, exportPx: 4096
 };
+var diveDir = 1;   // +1 dive (zoom in), -1 ascend (zoom out); set by the buttons
 var img = { w: 1, h: 1, aspect: 1, name: "sample scene" };
-var samp = null;
-var gridRaw = new Float32Array(3);
-var gridS = new Float32Array(3);
+var samp = null;                 // {data, w, h} small copy for colour maths
+var gridRaw = new Float32Array(3);  // averaged region colours
+var gridS = new Float32Array(3);    // the same, after tint saturation
 var gam = [1,1,1], gamL = 1;
 var V = { s: 1, ox: 0, oy: 0, anc: [] };
 var cvW = 1, cvH = 1, dpr = 1, dirty = true, diving = false, tween = null, ready = false;
 var FLOORPX = 40, floorOverride = 0, HANDOFF = 40, texW = 1, qual = 1;
 
+/* ---------- colour helpers (mirror of the fragment shader) ---------- */
 function toLin(c){ return P.linear ? Math.pow(Math.max(c,0), 2.2) : c; }
 function toOut(c){ return P.linear ? Math.pow(Math.max(c,0), 1/2.2) : c; }
 function lum(r,g,b){ return 0.2126*r + 0.7152*g + 0.0722*b; }
@@ -580,6 +599,7 @@ function compose(li, tr, tg, tb, tf){
   O[0] = toOut(br + (r - br)*s); O[1] = toOut(bg + (g - bg)*s); O[2] = toOut(bb + (b - bb)*s);
 }
 
+/* ---------- traversal ---------- */
 function emit(x, y, w, h, tr, tg, tb, tf, rem){
   var o = n * STRIDE;
   inst[o] = x; inst[o+1] = y; inst[o+2] = w; inst[o+3] = h;
@@ -591,6 +611,8 @@ function walk(x, y, w, h, tr, tg, tb, tf, depth){
   if(x >= cvW || y >= cvH || x + w <= 0 || y + h <= 0) return;
   if(n >= CAP) return;
   var G = P.G, sw = w / G;
+  /* stop early and let the fragment shader finish the descent: it reaches the
+     pixel with one quad, where the CPU would need G^k of them */
   if(depth >= P.levels || sw < FLOORPX){ emit(x, y, w, h, tr, tg, tb, tf, P.levels - depth); return; }
   var sh = h / G;
   var i0 = Math.max(0, Math.floor((0 - x) / sw)), i1 = Math.min(G - 1, Math.floor((cvW - x) / sw));
@@ -606,7 +628,7 @@ function walk(x, y, w, h, tr, tg, tb, tf, depth){
 function build(){
   n = 0;
   FLOORPX = floorOverride || HANDOFF * dpr;
-  var tr = 1, tg = 1, tb = 1, tf = 0;
+  var tr = 1, tg = 1, tb = 1, tf = 0, G = P.G;
   for(var a = 0; a < V.anc.length; a++){
     var k = V.anc[a];
     compose(k * 3, tr, tg, tb, tf);
@@ -615,6 +637,7 @@ function build(){
   walk(V.ox, V.oy, V.s, V.s * img.aspect, tr, tg, tb, tf, 0);
 }
 
+/* ---------- view ---------- */
 function coverScale(){ return Math.max(cvW, cvH / img.aspect); }
 function fit(){
   var s = Math.min(cvW * 0.94, (cvH * 0.94) / img.aspect);
@@ -625,7 +648,9 @@ function fit(){
 function rootCovers(){
   return V.ox <= 0.5 && V.oy <= 0.5 && V.ox + V.s >= cvW - 0.5 && V.oy + V.s * img.aspect >= cvH - 0.5;
 }
-
+/* Keep the drawn frame as the smallest ancestor that still covers the screen.
+   Zoom therefore never runs out of float precision: V.s stays inside one
+   octave-band of the viewport no matter how deep the dive goes. */
 function reanchor(){
   var G = P.G, guard = 0, cover = coverScale(), ceiling = cover * Math.pow(G, 4);
   while(V.anc.length && !rootCovers() && guard++ < 400){
@@ -635,6 +660,10 @@ function reanchor(){
   while(guard++ < 400){
     var cw = V.s / G, ch = V.s * img.aspect / G;
     if(cw < cvW || ch < cvH) break;
+    /* A zoom point sitting exactly on a cell boundary can never be inside a
+       covering child. That is unreachable in practice, but if the frame ever
+       climbs far past its band, take the nearest cell and slide the view onto
+       it rather than letting the numbers run away. */
     var force = V.s > ceiling;
     var i = Math.floor((cvW / 2 - V.ox) / cw), j = Math.floor((cvH / 2 - V.oy) / ch);
     if(force){ i = Math.min(G - 1, Math.max(0, i)); j = Math.min(G - 1, Math.max(0, j)); }
@@ -658,6 +687,7 @@ function zoomAt(px, py, f){
   dirty = true;
 }
 
+/* ---------- render ---------- */
 function hex2rgb(h){
   var v = parseInt(h.slice(1), 16);
   return [((v >> 16) & 255) / 255, ((v >> 8) & 255) / 255, (v & 255) / 255];
@@ -694,6 +724,7 @@ function draw(){
   gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, n);
 }
 
+/* ---------- colour analysis ---------- */
 var LIN = new Float32Array(256), LINon = -1;
 function linTable(){
   if(LINon === (P.linear ? 1 : 0)) return;
@@ -747,7 +778,8 @@ function applyGrid(){
   deriveAccent();
   dirty = true;
 }
-
+/* the same target colours the CPU folds, handed to the shader so its levels
+   compose from exactly the same numbers */
 var gridPx = new Float32Array(4);
 function uploadGrid(){
   var G = P.G;
@@ -810,6 +842,7 @@ function deriveAccent(){
   root.style.setProperty("--accent-dark", hsl2css(bh, Math.min(0.62, s), 0.70));
 }
 
+/* ---------- image intake ---------- */
 function uploadTexture(src, w, h){
   var sw = w, sh = h;
   if(Math.max(w, h) > MAXTEX){
@@ -841,17 +874,24 @@ function setImage(src, w, h, name){
   computeGrid();
   fit();
 }
+function afterLoad(src, w, h, name){
+  setImage(src, w, h, name);
+  /* On phones the controls are a full-screen drawer; once a picture is chosen,
+     drop straight back to the canvas so the result is visible. */
+  if(window.matchMedia("(max-width:820px)").matches){ stage.classList.add("collapsed"); resize(); }
+}
 function loadFile(f){
   if(!f || !/^image\//.test(f.type)) return;
   createImageBitmap(f).then(function(bm){
-    setImage(bm, bm.width, bm.height, f.name || "pasted image");
+    afterLoad(bm, bm.width, bm.height, f.name || "pasted image");
   }).catch(function(){
     var url = URL.createObjectURL(f), im = new Image();
-    im.onload = function(){ setImage(im, im.naturalWidth, im.naturalHeight, f.name || "pasted image"); URL.revokeObjectURL(url); };
+    im.onload = function(){ afterLoad(im, im.naturalWidth, im.naturalHeight, f.name || "pasted image"); URL.revokeObjectURL(url); };
     im.src = url;
   });
 }
 
+/* ---------- sample scene ---------- */
 function makeSample(){
   var w = 960, h = 640, c = document.createElement("canvas");
   c.width = w; c.height = h;
@@ -936,6 +976,7 @@ function makeSample(){
   setImage(c, w, h, "sample scene");
 }
 
+/* ---------- controls ---------- */
 function bindRange(id, out, apply, fmt){
   var el = $(id), lab = $(out);
   function run(){ var v = parseFloat(el.value); lab.textContent = fmt(v); apply(v); dirty = true; save(); }
@@ -943,6 +984,8 @@ function bindRange(id, out, apply, fmt){
 }
 function resetFrame(){ V.anc.length = 0; fit(); }
 
+/* cells per side runs 2 to 1024, so the slider is logarithmic - a linear one
+   would spend three quarters of its travel between 700 and 1024 */
 function gridOf(v){ return Math.max(2, Math.min(1024, Math.round(2 * Math.pow(512, v / 100)))); }
 function sliderOf(g){ return Math.round(100 * Math.log(g / 2) / Math.log(512)); }
 bindRange("sGrid", "vGrid", function(v){ P.G = gridOf(v); if(samp) computeGrid(); resetFrame(); },
@@ -964,27 +1007,44 @@ $("expPx").addEventListener("change", function(){ P.exportPx = Math.min(MAXBUF, 
 
 $("openBtn").onclick = $("openBtn2").onclick = function(){ fileIn.click(); };
 fileIn.addEventListener("change", function(){ if(this.files[0]) loadFile(this.files[0]); });
-$("sampleBtn").onclick = makeSample;
+$("sampleBtn").onclick = function(){
+  makeSample();
+  if(window.matchMedia("(max-width:820px)").matches){ stage.classList.add("collapsed"); resize(); }
+};
 $("fitBtn").onclick = resetFrame;
-
 $("showRail").onclick = function(){ stage.classList.remove("collapsed"); resize(); };
-$("closeRail").onclick = function(){ stage.classList.add("collapsed"); resize(); };
+$("hideRail").onclick = function(){ stage.classList.add("collapsed"); resize(); };
 
-var diveBtn = $("diveBtn");
-diveBtn.onclick = function(){ diving = !diving; diveBtn.classList.toggle("on", diving); diveBtn.textContent = diving ? "Stop" : "Dive"; };
+var diveBtn = $("diveBtn"), ascendBtn = $("ascendBtn");
+var isPhone = function(){ return window.matchMedia("(max-width:820px)").matches; };
+function syncDiveButtons(){
+  var divingDown = diving && diveDir > 0, divingUp = diving && diveDir < 0;
+  diveBtn.classList.toggle("on", divingDown);
+  ascendBtn.classList.toggle("on", divingUp);
+  diveBtn.textContent = divingDown ? "Stop" : "Dive";
+  ascendBtn.textContent = divingUp ? "Stop" : "Ascend";
+}
+/* Dive plays forward (+), Ascend plays reverse (-). Hitting a button while
+   already running that way stops; hitting it while stopped or running the other
+   way starts it in that direction. */
+function setDive(dir){
+  if(diving && diveDir === dir){ diving = false; }
+  else { diveDir = dir; diving = true; if(isPhone()){ stage.classList.add("collapsed"); resize(); } }
+  syncDiveButtons();
+}
+diveBtn.onclick = function(){ setDive(1); };
+ascendBtn.onclick = function(){ setDive(-1); };
 
-/* ---------- pointer, touch, drop, keys ---------- */
-var pts = new Map(), pinch = null, lastTap = 0;
+/* ---------- pointer, wheel, drop, keys ---------- */
+var pts = new Map(), pinch = null;
 function ptr(e){ var r = cv.getBoundingClientRect();
   return { x: (e.clientX - r.left) * dpr, y: (e.clientY - r.top) * dpr }; }
-
 cv.addEventListener("pointerdown", function(e){
   cv.setPointerCapture(e.pointerId);
   pts.set(e.pointerId, ptr(e));
   pinch = null;
   cv.classList.add("drag");
 });
-
 cv.addEventListener("pointermove", function(e){
   if(!pts.has(e.pointerId)) return;
   var prev = pts.get(e.pointerId), now = ptr(e);
@@ -1002,28 +1062,19 @@ cv.addEventListener("pointermove", function(e){
     pinch = { d: d, mx: mx, my: my };
   }
 });
-
-function endPtr(e){
-  var now = performance.now();
-  if(pts.size === 1 && now - lastTap < 300){
-    var q = ptr(e);
-    tween = { remain: P.G, x: q.x, y: q.y };
-  }
-  lastTap = now;
-  pts.delete(e.pointerId);
-  pinch = null;
-  if(!pts.size) cv.classList.remove("drag");
-}
-
+function endPtr(e){ pts.delete(e.pointerId); pinch = null; if(!pts.size) cv.classList.remove("drag"); }
 cv.addEventListener("pointerup", endPtr);
 cv.addEventListener("pointercancel", endPtr);
-
 cv.addEventListener("wheel", function(e){
   e.preventDefault();
   var q = ptr(e);
   var f = Math.pow(1.0016, -e.deltaY * (e.deltaMode === 1 ? 18 : 1));
   zoomAt(q.x, q.y, Math.min(4, Math.max(0.25, f)));
 }, {passive:false});
+cv.addEventListener("dblclick", function(e){
+  var q = ptr(e);
+  tween = { remain: P.G, x: q.x, y: q.y };
+});
 
 var dragDepth = 0;
 window.addEventListener("dragenter", function(e){ e.preventDefault(); dragDepth++; dropEl.classList.add("show"); });
@@ -1043,12 +1094,13 @@ window.addEventListener("keydown", function(e){
   var k = e.key.toLowerCase();
   if(k === "f"){ resetFrame(); }
   else if(k === " " || k === "d"){ e.preventDefault(); diveBtn.click(); }
+  else if(k === "a"){ e.preventDefault(); ascendBtn.click(); }
   else if(k === "c"){ stage.classList.toggle("collapsed"); resize(); }
   else if(k === "escape"){ $("modal").classList.remove("show"); }
 });
 
 /* ---------- settings memory ---------- */
-var KEY = "teleidoscope.v1";
+var KEY = "teleidescope.v5";
 function save(){
   try{ localStorage.setItem(KEY, JSON.stringify(P)); }catch(err){}
 }
@@ -1071,7 +1123,15 @@ function restore(){
 }
 
 /* ---------- export ---------- */
-var lastUrl = null;
+/* Hosted copies of this page cannot start a download on their own; the viewer
+   grants that through the runtime, so use it when it is there and fall back to
+   the plain link when the file is opened straight off disk. */
+var saver = null, lastBlob = null, lastName = "mosaic.png";
+if(window.claude && typeof window.claude.use === "function"){
+  try{
+    window.claude.use("downloads").then(function(d){ saver = d; }, function(){});
+  }catch(err){}
+}
 function exportPNG(whole){
   if(!ready) return;
   var px = Math.min(MAXBUF, Math.max(256, parseInt($("expPx").value, 10) || 4096));
@@ -1100,24 +1160,39 @@ function exportPNG(whole){
   };
   cv.toBlob(function(blob){
     if(!blob){ restoreView(); return; }
-    if(lastUrl) URL.revokeObjectURL(lastUrl);
-    lastUrl = URL.createObjectURL(blob);
-
-    $("expImg").src = lastUrl;
+    var url = URL.createObjectURL(blob);
+    $("expImg").src = url;
     var a = $("expDl");
-    a.href = lastUrl;
-    var fileName = (img.name || "mosaic").replace(/\.[^.]+$/, "") + "-teleidoscope-" + tw + "x" + th + ".png";
-    a.download = fileName;
-
-    $("expMeta").textContent = tw + " x " + th + " px  /  " + layers.toFixed(1) + " layers  /  " +
+    a.href = url;
+    lastBlob = blob;
+    lastName = (img.name || "mosaic").replace(/\.[^.]+$/, "") + "-teleidescope-" + tw + "x" + th + ".png";
+    a.download = lastName;
+    $("expMeta").textContent = tw + " x " + th + " px  /  " + layers.toFixed(1) + " layers deep  /  " +
       (blob.size / 1048576).toFixed(1) + " MB";
+    $("expHint").textContent = "Right-click the image to save it anywhere else.";
     $("modal").classList.add("show");
     restoreView();
   }, "image/png");
 }
-
 $("expView").onclick = function(){ exportPNG(false); };
 $("expAll").onclick = function(){ exportPNG(true); };
+$("expDl").addEventListener("click", function(e){
+  if(!saver || !lastBlob) return;          // plain link handles the local file
+  e.preventDefault();
+  var btn = this, was = btn.textContent;
+  btn.textContent = "Saving...";
+  saver.save({ filename: lastName, data: lastBlob }).then(function(){
+    btn.textContent = "Saved";
+    setTimeout(function(){ btn.textContent = was; }, 1600);
+  }, function(err){
+    btn.textContent = was;
+    var c = err && err.code;
+    $("expHint").textContent = c === "declined" ? "Save cancelled. The picture is still here."
+      : c === "too_large" ? "That file is over the 16 MB save limit - export a smaller long edge, or right-click the image."
+      : c === "rate_limited" ? "A save prompt is already open. Try again in a moment."
+      : "Saving is not available here - right-click the image and choose Save image as.";
+  });
+});
 $("expClose").onclick = function(){ $("modal").classList.remove("show"); };
 $("modal").addEventListener("click", function(e){ if(e.target === this) this.classList.remove("show"); });
 
@@ -1145,7 +1220,9 @@ function frame(now){
     if(tween.remain <= 1.001) tween = null;
   }
   if(diving && ready){
-    var g = Math.pow(P.G, P.speed * dt);
+    var g = Math.pow(P.G, Math.abs(P.speed) * diveDir * dt);
+    /* two pixels off dead centre: a zoom fixed exactly on a cell corner has no
+       covering cell to descend into, and dead centre is exactly that corner */
     if(Math.abs(g - 1) > 1e-6) zoomAt(cvW / 2 + 2, cvH / 2 + 2, g);
   }
   if(dirty){
@@ -1163,18 +1240,19 @@ function frame(now){
   if(acc > 0.5){
     fps = frames / acc; acc = 0; frames = 0;
     $("stFps").textContent = fps.toFixed(0);
+    /* on a slow machine, coarsen the finest cell rather than stutter - the
+       level crossfade means this reads as a touch of softness, not a jump */
     var q = fps < 22 ? Math.min(2.5, qual * 1.12) : fps > 45 ? Math.max(1, qual * 0.94) : qual;
     if(Math.abs(q - qual) > 0.005){ qual = q; dirty = true; }
   }
   requestAnimationFrame(frame);
 }
 
-/* Auto-collapse sidebar on desktop if screen is large enough, or default to collapsed on phone */
-if(window.innerWidth > 820){
-  stage.classList.remove("collapsed");
-}
-
+/* ---------- go ---------- */
 restore();
+/* On phones the rail is a full-screen overlay drawer, so start with it closed
+   and the mosaic showing. Tap "Controls" to open it, "Done" to close it. */
+if(window.matchMedia("(max-width:820px)").matches){ stage.classList.add("collapsed"); }
 resize();
 makeSample();
 requestAnimationFrame(frame);
